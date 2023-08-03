@@ -1,5 +1,5 @@
-import { accBroadcastingNetworkLib } from 'acc-broadcasting-network-lib';
+import { accBroadcastingNetworkLib} from 'acc-broadcasting-network-lib';
+import { AccBroadcastServer } from './utils/acc-broadcast-server.class';
 
-console.log('Hello World');
-const result = accBroadcastingNetworkLib();
-console.log(result);
+const server = new AccBroadcastServer();
+server.connect();
