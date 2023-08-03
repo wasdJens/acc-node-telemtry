@@ -1,0 +1,9 @@
+{
+  "name": "acc-testing-client",
+  "version": "0.0.0",
+  "main": "dist/index.js",
+  "devDependencies": {},
+  "dependencies": {
+    "acc-broadcasting-network-lib": "*"
+  }
+}
