@@ -15,4 +15,4 @@ There are some other javascript based implementations available at github:
 ## Goals
 
 - A typescript Library that handles all the communication with the ACC Network Traffic (Connection, Fetching all Data in real time etc.)
-- Storage, logs and visualiation of the raw data in some kind so that dashboards and other websites can be built on top of it (I am thinking about a simple angular dashboard that llows to track lap times as a first use case)
+- Storage, logs and visualiation of the raw data in some kind so that dashboards and other websites can be built on top of it (I am thinking about a simple angular dashboard that allows to track lap times as a first use case)
