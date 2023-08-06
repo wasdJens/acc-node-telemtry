@@ -4,13 +4,14 @@ export class BinaryReaderNode {
   constructor(binaryData) {
     this.buffer = Buffer.from(binaryData, 'binary');
     this.position = 0;
+    console.log('Buffer: ', this.buffer);
   }
 
-  readInt8() {
+  readUInt8() {
     if (this.position + 1 > this.buffer.length) {
       throw new Error('Trying to read beyond the end of the binary stream.');
     }
-    const int8Value = this.buffer.readInt8(this.position);
+    const int8Value = this.buffer.readUInt8(this.position);
     this.position += 1;
     return int8Value;
   }
@@ -24,21 +25,27 @@ export class BinaryReaderNode {
     return int32Value;
   }
 
-  readByte() {
+  readBytes(length: number) {
     if (this.position + 1 > this.buffer.length) {
       throw new Error('Trying to read beyond the end of the binary stream.');
     }
-    const byteValue = this.buffer.readUInt8(this.position);
-    this.position += 1;
+    const byteValue = this.buffer.slice(this.position, this.position + length);
+    this.position += length;
     return byteValue;
   }
 
   readString() {
-    if (this.position + length > this.buffer.length) {
-      throw new Error('Trying to read beyond the end of the binary stream.');
-    }
-    const stringValue = this.buffer.toString('binary', this.position, this.position + length);
-    this.position += length;
-    return stringValue;
+    const length = this.buffer.readUint16LE(this.position);
+    const bytes = this.readBytes(length);
+    return bytes.toString();
+    // if (!length) {
+    //   length = this.buffer.length - this.position;
+    // }
+    // if (this.position + length > this.buffer.length) {
+    //   throw new Error('Trying to read beyond the end of the binary stream.');
+    // }
+    // const stringValue = this.buffer.toString('binary', this.position, this.position + length);
+    // this.position += length;
+    // return stringValue;
   }
 }

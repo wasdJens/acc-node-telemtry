@@ -1,1 +1,1 @@
-export * from './lib/acc-broadcasting-network-lib';
+export * from './lib/broadcast/acc-broadcast-server.class';
