@@ -1,22 +1,23 @@
 export class BinaryWriterNode {
   buffer: Buffer;
-  endianness: string;
+  length: number;
 
   constructor() {
-    this.buffer = Buffer.alloc(0);
-    // TODO: Support big endian
-    this.endianness = 'little';
+    this.buffer = new Buffer(0);
+    this.length = 0;
   }
 
   writeUInt16(value: number) {
     const buffer = Buffer.alloc(2);
     buffer.writeUInt16LE(value, 0);
+    this.length += 2;
     this.writeBuffer(buffer);
   }
 
   writeUInt32(value: number) {
     const buffer = Buffer.alloc(4);
     buffer.writeUInt32LE(value, 0);
+    this.length += 4;
     this.writeBuffer(buffer);
   }
 
@@ -25,11 +26,12 @@ export class BinaryWriterNode {
       throw new Error('Invalid bytes. Bytes must be an array.');
     }
     const buffer = Buffer.from(bytes);
+    this.length += bytes.length;
     this.writeBuffer(buffer);
   }
 
   writeBuffer(buffer: Buffer) {
-    this.buffer = Buffer.concat([this.buffer, buffer]);
+    this.buffer = Buffer.concat([this.buffer, buffer], this.length);
   }
 
   convertStringToUtf8(value: string) {
@@ -37,7 +39,7 @@ export class BinaryWriterNode {
   }
 
   getBinaryData() {
-    console.log(this.buffer)
+    // console.log(this.buffer)
     return this.buffer;
   }
 }

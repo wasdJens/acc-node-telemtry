@@ -1,7 +1,12 @@
+/* eslint-disable no-case-declarations */
 import { Socket } from "dgram";
 import { ACCInbountMessageTypes, ACCOutboundMessageTypes, BROADCASTING_PROTOCOL_VERSION } from "../interfaces/acc-messages.enums";
 import { BinaryReaderNode } from "../utils/binary-reader.class";
 import { BinaryWriterNode } from "../utils/binary-writer.class";
+import { logger } from "../utils/logging";
+import { handleEntryList, handleRealtimeCarUpdate, handleRegistrationResult } from "./acc-message-handlers";
+import { requestEntryList, requestTrackData } from "./acc-request-handlers";
+// import binutils from "binutils";
 
 export class AccBroadcastServer {
   server: Socket;
@@ -21,32 +26,50 @@ export class AccBroadcastServer {
 
   setupServerMessages() {
     this.server.on('message', (msg, rinfo) => {
-      console.log(`server got: message from ${rinfo.address}:${rinfo.port}`);
+      // logger.info(`server got: message from ${rinfo.address}:${rinfo.port}`)
+      // const r = new binutils.BinaryReader(msg, 'little');
       const reader = new BinaryReaderNode(msg);
       const messageType = reader.readUInt8();
-      console.log('Message Type: ', messageType);
-      const result: any = {};
+      // console.log('MessageType: ', messageType);
+      //logger.info(`server got: message type ${messageType}`)
 
       switch (messageType) {
         case ACCInbountMessageTypes.REGISTRATION_RESULT:
+          try {
+            this.connectionId = handleRegistrationResult(reader);
+            requestEntryList(this.server, this.connectionId, this.port, this.address);
+            requestTrackData(this.server, this.connectionId, this.port, this.address);
+          } catch (e) {
+            console.error(e);
+            this.server.close();
+          }
+          break;
+        case ACCInbountMessageTypes.ENTRY_LIST:
           this.connectionId = reader.readInt32();
-          result.success = reader.readBytes(1).readUInt8(0) > 0;
-          // this.requestEntryList();
-          // this.requestTrackData();
+          handleEntryList(reader);
+          break;
+        case ACCInbountMessageTypes.REALTIME_CAR_UPDATE:
+
+          // const connectionId = reader.readUInt32();
+          // this.connectionId = connectionId;
+
+          try {
+            handleRealtimeCarUpdate(reader);
+          } catch (e) {
+            requestEntryList(this.server, this.connectionId!, this.port, this.address);
+          }
           break;
       }
-
-      console.log(result);
     });
 
     this.server.on('error', (err) => {
-      console.error(`server error:\n${err.stack}`);
+      //logger.error(`server error:\n${err.stack}`);
       this.server.close();
     });
 
     this.server.on('listening', () => {
       const address = this.server.address();
-      console.log(`server listening ${address.address}:${address.port}`);
+      //logger.info(`server listening ${address.address}:${address.port}`);
     });
   }
 
@@ -81,6 +104,9 @@ export class AccBroadcastServer {
   }
 
   disconnect() {
+    if (!this.connectionId) {
+      throw new Error('Not connected to server')
+    }
     const binaryWriter = new BinaryWriterNode();
     binaryWriter.writeBytes(
       [ACCOutboundMessageTypes.UNREGISTER_COMMAND_APPLICATION]
@@ -97,11 +123,13 @@ export class AccBroadcastServer {
       this.address,
       this.handleError
     );
+
+    this.server.close();
   }
 
   handleError(error: Error | null) {
     if (error) {
-      console.error(error);
+      //logger.error(`server error:\n${error.stack} \n ${error}`);
     }
   }
 }

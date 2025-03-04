@@ -1,6 +1,7 @@
 import { Socket } from 'dgram';
 import { ACCOutboundMessageTypes } from '../interfaces/acc-messages.enums';
 import { BinaryWriterNode } from '../utils/binary-writer.class';
+import { logger } from '../utils/logging';
 
 export function requestTrackData(
   serverInstance: Socket,
@@ -13,7 +14,7 @@ export function requestTrackData(
   binaryWriter.writeUInt32(connectionId);
 
   const binaryDataToSend = binaryWriter.getBinaryData();
-  console.log('Request Track Data: ', binaryDataToSend);
+  //logger.debug('Request Track Data: ', binaryDataToSend);
 
   serverInstance.send(
     binaryDataToSend,
@@ -36,7 +37,7 @@ export function requestEntryList(
   binaryWriter.writeUInt32(connectionId);
 
   const binaryDataToSend = binaryWriter.getBinaryData();
-  console.log('Request Entry List: ', binaryDataToSend);
+  //logger.debug('Request Entry List: ', binaryDataToSend);
 
   serverInstance.send(
     binaryDataToSend,
@@ -50,12 +51,12 @@ export function requestEntryList(
 
 function handleRequestTrackDataError(error: Error | null) {
   if (error) {
-    console.error('Request Track Data Error: ', error);
+    //logger.error('Request Track Data Error: ', error);
   }
 }
 
 function handleRequestEntryListError(error: Error | null) {
   if (error) {
-    console.error('Request Entry List Error: ', error);
+    //logger.error('Request Entry List Error: ', error);
   }
 }

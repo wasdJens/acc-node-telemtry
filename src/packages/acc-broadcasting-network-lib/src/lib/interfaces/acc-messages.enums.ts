@@ -1,4 +1,3 @@
-
 export enum ACCInbountMessageTypes {
   REGISTRATION_RESULT = 1,
   REALTIME_UPDATE = 2,
@@ -17,6 +16,21 @@ export enum ACCOutboundMessageTypes {
   CHANGE_HUD_PAGE = 49,
   CHANGE_FOCUS = 50,
   INSTANT_REPLAY_REQUEST = 51,
+}
+
+export enum ACCCarLocationEnum {
+  NONE = 0,
+  Track = 1,
+  Pitlane = 2,
+  PitEntry = 3,
+  PitExit = 4,
+}
+
+export enum ACCLapType {
+  ERROR = 0,
+  Outlap = 1,
+  Regular = 2,
+  Inlap = 3,
 }
 
 export const BROADCASTING_PROTOCOL_VERSION = 4;
